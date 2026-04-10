@@ -105,7 +105,7 @@ The **Video** category and **Seedance 2.0 Prompt Builder** card appear automatic
 
 - **[CineFlow Studio Standalone](https://github.com/MediaAI-AT/cineflow-studio-standalone)** — AI music video pipeline with built-in Seedance 2.0 support and an "✨ Enhance for Seedance" button that uses this skill's format
 - **[RUBRIC Console](https://github.com/robonuggets/rubric)** — the agent command centre this skill is built for
-- **[WaveSpeed](https://wavespeed.ai)** — the API that runs Seedance 2.0
+- **[WaveSpeed](https://wavespeed.ai/?ref=krzysztof)** — the API that runs Seedance 2.0
 
 ---
 
