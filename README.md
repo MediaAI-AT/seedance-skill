@@ -125,7 +125,7 @@ seedance-skill/
 
 ## Credits
 
-Prompt structure and effects breakdown format based on the work of **[Rourke Heath](https://www.youtube.com/@RourkeHeath)** — check out his YouTube channel for in-depth Seedance 2.0 tutorials and prompt techniques.
+Prompt structure and effects breakdown format based on the work of **[Rourke Heath](https://www.youtube.com/@RourkeHeath)** on YouTube — check out his channel for in-depth Seedance 2.0 tutorials and prompt techniques.
 
 ---
 
