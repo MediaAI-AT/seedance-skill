@@ -1,9 +1,11 @@
 # 🎬 Seedance 2.0 Prompt Builder — Skill for RUBRIC & Claude Code
 
+> **This is a merged skill** — combining the cinematic shot-by-shot prompt structure from [MediaAI-AT's original skill](https://github.com/MediaAI-AT/seedance-skill) with the Seedance 2.0 platform knowledge (@ reference system, input constraints, use-case patterns) from [dexhunter/seedance2-skill](https://github.com/dexhunter/seedance2-skill). The result covers both pure text-to-video workflows and full asset-based generation in a single skill.
+
 A skill that turns any creative brief **or uploaded assets** into a complete, generation-ready video prompt for [Seedance 2.0](https://wavespeed.ai) — ByteDance's AI video generation model.
 
 Works in two modes:
-- **Text-to-video** — describe a concept, get a structured prompt
+- **Text-to-video** — describe a concept, get a structured prompt with shot-by-shot effects timeline, density map, and energy arc
 - **Asset-based** — share images, videos, or audio and the skill builds an `@reference` prompt with full cinematic breakdown
 
 Every output includes the four sections Seedance needs to produce great results: a shot-by-shot effects timeline, a master effects inventory, an effects density map, and an energy arc.
@@ -170,7 +172,11 @@ seedance-skill/
 
 ## Credits
 
-Prompt structure and effects breakdown format based on the work of **[Rourke Heath](https://www.youtube.com/@RourkeHeath)** on YouTube — check out his channel for in-depth Seedance 2.0 tutorials and prompt techniques.
+This skill merges the best of two approaches:
+
+- **Platform knowledge, @ reference syntax, and use-case patterns** — from **[dexhunter/seedance2-skill](https://github.com/dexhunter/seedance2-skill)** — a comprehensive Seedance 2.0 prompt writing skill covering input constraints, camera language, and ready-to-use templates for ads, dramas, MVs, and more.
+
+- **Cinematic shot grammar, effects breakdown structure, and energy arc format** — originally developed for this repo, inspired by the work of **[Rourke Heath](https://www.youtube.com/@RourkeHeath)** on YouTube — check out his channel for in-depth Seedance 2.0 tutorials and prompt techniques.
 
 ---
 
