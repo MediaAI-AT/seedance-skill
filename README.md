@@ -1,18 +1,24 @@
 # 🎬 Seedance 2.0 Prompt Builder — Skill for RUBRIC & Claude Code
 
-A skill that turns any creative brief into a **structured, shot-by-shot video prompt** optimised for [Seedance 2.0](https://wavespeed.ai) — ByteDance's AI video generation model.
+A skill that turns any creative brief **or uploaded assets** into a complete, generation-ready video prompt for [Seedance 2.0](https://wavespeed.ai) — ByteDance's AI video generation model.
 
-Every output includes four sections Seedance needs to produce great results: a shot-by-shot effects timeline, a master effects inventory, an effects density map, and an energy arc.
+Works in two modes:
+- **Text-to-video** — describe a concept, get a structured prompt
+- **Asset-based** — share images, videos, or audio and the skill builds an `@reference` prompt with full cinematic breakdown
+
+Every output includes the four sections Seedance needs to produce great results: a shot-by-shot effects timeline, a master effects inventory, an effects density map, and an energy arc.
 
 ---
 
 ## What it does
 
-Give it a brief like:
+### Mode A — You have a written brief
+
+Give it something like:
 
 > "A trail runner at golden hour, mountain setting, epic but not over-the-top, 15 seconds"
 
-Get back a fully structured prompt like:
+Get back a fully structured prompt:
 
 ```
 SHOT 1 (0:00–0:02) — Wide Establish / Runner Enters Frame
@@ -22,7 +28,7 @@ SHOT 1 (0:00–0:02) — Wide Establish / Runner Enters Frame
 • Approximately 60% speed — unhurried, contemplative opening
 • EXIT: dissolve into Shot 2 via soft bloom
 
-[...10 more shots...]
+[...more shots...]
 
 MASTER EFFECTS INVENTORY
 1. Speed ramp (deceleration) — used 3x — Shots 4, 7, 10
@@ -37,33 +43,73 @@ ENERGY ARC
 Act 1 (0:00–0:05): Atmospheric entry...
 ```
 
+### Mode B — You have assets to upload
+
+Share your files and describe what you want:
+
+> "I have a product photo (@Image1) and a reference ad video (@Video1) — make a 10s product showcase"
+
+The skill assigns `@reference` roles, maps platform constraints, and produces:
+
+```
+@Image1 as the first frame, product details reference @Image1,
+reference @Video1's camera transitions and pacing.
+
+SHOT 1 (0:00–0:03) — Product Entry
+• EFFECT: Digital zoom (scale-in) + anamorphic lens flare (gold)
+...
+```
+
+Supports all Seedance input types: images, videos, audio — up to 12 files combined.
+
+---
+
+## Capabilities
+
+| Use case | Supported |
+|---|---|
+| Text-to-video brief → structured prompt | ✅ |
+| Character consistency across shots | ✅ |
+| Camera movement replication from reference video | ✅ |
+| Effects / transition style replication | ✅ |
+| Video extension (forward or backward) | ✅ |
+| Video editing / plot subversion | ✅ |
+| Music beat-matching | ✅ |
+| Dialogue and voice acting | ✅ |
+| One-take / long take sequences | ✅ |
+| E-commerce product showcases | ✅ |
+| Educational / scientific visualizations | ✅ |
+
 ---
 
 ## Install in Claude Code
 
 ### Option A — Project skill (recommended)
 
-Copy `skill/SKILL.md` into your project's `.claude/skills/` folder:
-
 ```bash
-# From your project root
-mkdir -p .claude/skills/seedance-prompt-builder
-curl -o .claude/skills/seedance-prompt-builder/SKILL.md \
+mkdir -p .claude/skills/video-prompt-builder
+curl -o .claude/skills/video-prompt-builder/SKILL.md \
   https://raw.githubusercontent.com/MediaAI-AT/seedance-skill/main/skill/SKILL.md
+
+mkdir -p .claude/skills/video-prompt-builder/references
+curl -o .claude/skills/video-prompt-builder/references/effects-breakdown-reference.txt \
+  https://raw.githubusercontent.com/MediaAI-AT/seedance-skill/main/skill/references/effects-breakdown-reference.txt
+curl -o .claude/skills/video-prompt-builder/references/platform-reference.md \
+  https://raw.githubusercontent.com/MediaAI-AT/seedance-skill/main/skill/references/platform-reference.md
 ```
 
-Claude Code will auto-detect the skill. Trigger it by describing a video concept in chat.
+Claude Code will auto-detect the skill. Trigger it by describing a video concept or sharing assets in chat.
 
 ### Option B — Global skill (available in all projects)
 
 ```bash
-mkdir -p ~/AppData/Roaming/Claude/skills/seedance-prompt-builder   # Windows
-# or
-mkdir -p ~/.claude/skills/seedance-prompt-builder                   # Mac/Linux
-
-curl -o <path-above>/SKILL.md \
-  https://raw.githubusercontent.com/MediaAI-AT/seedance-skill/main/skill/SKILL.md
+# Windows
+mkdir -p ~/AppData/Roaming/Claude/skills/video-prompt-builder
+# Mac / Linux
+mkdir -p ~/.claude/skills/video-prompt-builder
 ```
+
+Then download all three files (SKILL.md + both references) into that folder using the URLs above.
 
 ---
 
@@ -89,14 +135,12 @@ cd <your-rubric-dir>/scaffold
 node server.js
 ```
 
-The **Video** category and **Seedance 2.0 Prompt Builder** card appear automatically — no config needed.
-
 ### Step 3 — Use it
 
 1. Open RUBRIC → **Skill Hub** tab
 2. Click **Video** in the sidebar
 3. Click **Seedance 2.0 Prompt Builder**
-4. Enter your brief in the input field
+4. Enter your brief or describe your assets
 5. Click **Run with Claude** → your structured prompt appears instantly
 
 ---
@@ -114,12 +158,13 @@ The **Video** category and **Seedance 2.0 Prompt Builder** card appear automatic
 ```
 seedance-skill/
 ├── skill/
-│   ├── SKILL.md          ← Claude Code version (auto-triggers on video briefs)
-│   └── skill-hub.md      ← RUBRIC Skill Hub card version
+│   ├── SKILL.md                              ← Claude Code version (auto-triggers on video briefs)
+│   ├── skill-hub.md                          ← RUBRIC Skill Hub card version
+│   └── references/
+│       ├── effects-breakdown-reference.txt   ← Cinematic effects calibration guide
+│       └── platform-reference.md             ← Camera tables, modifiers, 11 use-case patterns
 └── README.md
 ```
-
----
 
 ---
 
