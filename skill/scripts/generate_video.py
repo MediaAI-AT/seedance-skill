@@ -51,8 +51,9 @@ def upload_reference(file_path: str, api_key: str) -> str:
         print(f"  WARNING: Reference file not found: {file_path} — skipping")
         return None
 
-    # WaveSpeed file upload endpoint
-    upload_url = f"{API_BASE}/files/upload"
+    # WaveSpeed correct upload endpoint
+    upload_url = f"{API_BASE}/media/upload/binary"
+
     with open(path, "rb") as f:
         file_data = f.read()
 
@@ -60,19 +61,22 @@ def upload_reference(file_path: str, api_key: str) -> str:
     suffix = path.suffix.lower()
     content_types = {
         ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
-        ".webp": "image/webp", ".gif": "image/gif",
-        ".mp4": "video/mp4", ".mov": "video/quicktime",
-        ".mp3": "audio/mpeg", ".wav": "audio/wav",
+        ".webp": "image/webp", ".gif": "image/gif", ".bmp": "image/bmp",
+        ".tiff": "image/tiff", ".mp4": "video/mp4", ".mov": "video/quicktime",
+        ".avi": "video/x-msvideo", ".webm": "video/webm",
+        ".mp3": "audio/mpeg", ".wav": "audio/wav", ".aac": "audio/aac",
+        ".flac": "audio/flac", ".ogg": "audio/ogg",
     }
     content_type = content_types.get(suffix, "application/octet-stream")
 
-    # Build multipart form-data manually
-    boundary = "----WaveSpeedBoundary"
+    # Build multipart/form-data with unique boundary
+    boundary = "WaveSpeedUpload7x3k9z"
+    crlf = b"\r\n"
     body = (
         f"--{boundary}\r\n"
         f'Content-Disposition: form-data; name="file"; filename="{path.name}"\r\n'
         f"Content-Type: {content_type}\r\n\r\n"
-    ).encode() + file_data + f"\r\n--{boundary}--\r\n".encode()
+    ).encode("utf-8") + file_data + f"\r\n--{boundary}--\r\n".encode("utf-8")
 
     req = urllib.request.Request(
         upload_url,
@@ -85,16 +89,19 @@ def upload_reference(file_path: str, api_key: str) -> str:
     )
     try:
         with urllib.request.urlopen(req) as resp:
-            result = json.loads(resp.read().decode())
-            url = result.get("url") or result.get("file_url") or result.get("data", {}).get("url")
-            if url:
-                print(f"  Uploaded {path.name} → {url}")
-                return url
-            else:
-                print(f"  WARNING: Upload response had no URL: {result}")
-                return None
+            result = json.loads(resp.read().decode("utf-8"))
+        # Response: {"code": 200, "data": {"download_url": "...", ...}}
+        data = result.get("data", {})
+        url = data.get("download_url") or data.get("url") or result.get("url")
+        if url:
+            print(f"  Uploaded {path.name} → {url[:60]}...")
+            return url
+        else:
+            print(f"  WARNING: Upload response had no URL: {result}")
+            return None
     except urllib.error.HTTPError as e:
-        print(f"  WARNING: Upload failed for {path.name}: {e.code} {e.reason}")
+        body_err = e.read().decode("utf-8", errors="replace")
+        print(f"  WARNING: Upload failed for {path.name}: {e.code} {e.reason} — {body_err[:200]}")
         return None
 
 
