@@ -81,6 +81,41 @@ Supports all Seedance input types: images, videos, audio — up to 12 files comb
 | One-take / long take sequences | ✅ |
 | E-commerce product showcases | ✅ |
 | Educational / scientific visualizations | ✅ |
+| **Generate actual video via WaveSpeed API** | ✅ |
+| **Save MP4 locally with cost confirmation** | ✅ |
+
+---
+
+## Generate the actual video
+
+Once you have a prompt, Claude can run it directly via the WaveSpeed API:
+
+```
+"Generate this video on WaveSpeed"
+```
+
+Claude will show the cost, ask for confirmation, generate the video, and save it as an MP4 locally.
+
+### Pricing (720p)
+
+| Duration | Cost |
+|---|---|
+| 5s | $1.20 |
+| 10s | $2.40 |
+| 15s | $3.60 |
+
+### Requirements
+
+- Python 3.9+ (stdlib only — no pip installs)
+- A [WaveSpeed](https://wavespeed.ai) API key set as `WAVESPEED_API_KEY`
+
+### What happens
+
+1. Claude shows a cost summary and asks: *"Generate this video for $1.20? [y/N]"*
+2. Uploads any reference files to WaveSpeed CDN
+3. Submits the job and polls until complete (~1–2 min)
+4. Downloads the MP4 and saves it locally
+5. Reports file path, size, and cost
 
 ---
 
@@ -162,6 +197,8 @@ seedance-skill/
 ├── skill/
 │   ├── SKILL.md                              ← Claude Code version (auto-triggers on video briefs)
 │   ├── skill-hub.md                          ← RUBRIC Skill Hub card version
+│   ├── scripts/
+│   │   └── generate_video.py                 ← WaveSpeed API: generate, poll, download MP4
 │   └── references/
 │       ├── effects-breakdown-reference.txt   ← Cinematic effects calibration guide
 │       └── platform-reference.md             ← Camera tables, modifiers, 11 use-case patterns
