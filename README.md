@@ -218,3 +218,29 @@ This skill merges the best of two approaches:
 ---
 
 Built by [Media AI](https://github.com/MediaAI-AT) · Works with RUBRIC · Powered by Seedance 2.0
+
+---
+
+## Changelog
+
+### v1.1.0 — WaveSpeed API Integration + Bug Fixes
+
+**Critical bug fixes in `generate_video.py`:**
+
+- **Fixed file upload endpoint** — was calling `/api/v3/files/upload` (returns 404); correct endpoint is `/api/v3/media/upload/binary`. This was the root cause of character inconsistency — all reference images silently failed to upload, so Seedance generated videos from text only with random characters instead of your references.
+- **Fixed poll URL** — now uses the `urls.get` field from the job submission response instead of a hardcoded path that doesn't exist on the WaveSpeed API
+- **Fixed UTF-8 encoding crash on Windows** — Unicode box-drawing characters in the cost summary caused a `cp1252` codec error on Windows terminals; fixed with a UTF-8 stdout/stderr wrapper at script startup
+- **Fixed output parsing** — `outputs[0]` from the completed job can be a plain string URL or an object with a `url` field; both cases are now handled
+
+**Skill improvements:**
+
+- Added **Mode A (Asset-Based)** with full `@reference` system — assign explicit roles to images, videos, and audio files
+- Added **platform constraints table** — max 9 images, 3 videos, 3 audio, 12 total files; no real human faces
+- Added **11 use-case patterns** in `references/platform-reference.md` (character consistency, camera replication, e-commerce, beat-sync, etc.)
+- Added **Step 5** — after writing the prompt, the skill offers to run `generate_video.py` directly
+
+### v1.0.0 — Merged Skill Release
+
+- Combined cinematic shot grammar + effects breakdown structure from MediaAI-AT with @ reference system + platform knowledge from [dexhunter/seedance2-skill](https://github.com/dexhunter/seedance2-skill)
+- Full 4-section prompt output: shot-by-shot timeline, effects inventory, density map, energy arc
+- WaveSpeed API script for direct video generation and download
