@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import sys, io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 """
 WaveSpeed Seedance 2.0 — Video Generator
 Submits a prompt to WaveSpeed, polls until done, saves MP4 locally.
@@ -124,16 +128,20 @@ def submit_job(prompt: str, duration: int, aspect_ratio: str,
     with urllib.request.urlopen(req) as resp:
         result = json.loads(resp.read().decode())
 
-    pred_id = result.get("id") or result.get("data", {}).get("id")
+    # Response can be flat or nested under "data"
+    data = result.get("data", result)
+    pred_id = data.get("id")
     if not pred_id:
         print(f"ERROR: No prediction ID in response: {result}")
         sys.exit(1)
-    return pred_id
+
+    # Prefer the poll URL from the response's urls.get field
+    poll_url = (data.get("urls") or {}).get("get") or f"{API_BASE}/predictions/{pred_id}"
+    return pred_id, poll_url
 
 
-def poll_until_done(pred_id: str, api_key: str) -> str:
+def poll_until_done(poll_url: str, api_key: str) -> str:
     """Poll status endpoint until completed. Returns video URL."""
-    poll_url = f"{API_BASE}/predictions/{pred_id}"
     req_headers = {"Authorization": f"Bearer {api_key}"}
 
     spinner = ["|", "/", "—", "\\"]
@@ -165,7 +173,9 @@ def poll_until_done(pred_id: str, api_key: str) -> str:
                 print("ERROR: Status completed but no outputs in response.")
                 print(json.dumps(data, indent=2))
                 sys.exit(1)
-            return outputs[0]  # first video URL
+            # outputs can be array of strings or array of objects with "url"
+            first = outputs[0]
+            return first if isinstance(first, str) else first.get("url", str(first))
 
         elif status == "failed":
             print()
@@ -281,7 +291,7 @@ def main():
 
     # ── Submit job ───────────────────────────────────────────────────
     print("  Submitting to WaveSpeed...")
-    pred_id = submit_job(
+    pred_id, poll_url = submit_job(
         prompt=args.prompt,
         duration=args.duration,
         aspect_ratio=args.aspect_ratio,
@@ -290,12 +300,13 @@ def main():
         ref_audio_urls=ref_audio_urls,
         api_key=api_key,
     )
-    print(f"  Job ID: {pred_id}")
+    print(f"  Job ID  : {pred_id}")
+    print(f"  Poll URL: {poll_url}")
     print()
 
     # ── Poll ─────────────────────────────────────────────────────────
     print("  Waiting for generation to complete...")
-    video_url = poll_until_done(pred_id, api_key)
+    video_url = poll_until_done(poll_url, api_key)
     print(f"  Video URL: {video_url}")
     print()
 
