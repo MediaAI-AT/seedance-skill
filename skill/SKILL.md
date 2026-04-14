@@ -1,6 +1,6 @@
 ---
 name: video-prompt-builder
-description: Generate complete, production-ready AI video prompts for Seedance 2.0 from any creative brief or uploaded assets. Use this skill whenever the user wants to create a video prompt, write a shot list, plan a video sequence, describe a video concept for AI generation, or mentions Seedance, Jimeng, or ByteDance video generation. Also trigger when the user shares images, videos, or audio files they want turned into a video — even if they don't say "prompt." Trigger on phrases like "write me a video prompt", "Seedance prompt", "shot list", "plan a video", "video concept", "brand film prompt", "ad prompt", "I have photos I want to use", "extend this video", "make a video from these images", "beat-sync", "music video", or any time the user describes a visual sequence they want generated. Make sure to use this skill for ALL Seedance-related tasks — text-only briefs, asset-based prompts, video extension, character consistency, e-commerce ads, and short dramas alike.
+description: Generate complete, production-ready AI video prompts for Seedance 2.0 from any creative brief or uploaded assets — and optionally generate the actual video via WaveSpeed API. Use this skill whenever the user wants to create a video prompt, write a shot list, plan a video sequence, describe a video concept for AI generation, or mentions Seedance, Jimeng, or ByteDance video generation. Also trigger when the user shares images, videos, or audio files they want turned into a video, or says "generate the video", "make the video", "run it", "create it on WaveSpeed". Trigger on phrases like "write me a video prompt", "Seedance prompt", "shot list", "plan a video", "video concept", "brand film prompt", "ad prompt", "I have photos I want to use", "extend this video", "make a video from these images", "beat-sync", "music video", or any time the user describes a visual sequence they want generated. Make sure to use this skill for ALL Seedance-related tasks — text-only briefs, asset-based prompts, video extension, character consistency, e-commerce ads, short dramas, and direct video generation alike.
 ---
 
 # Video Prompt Builder — Seedance 2.0
@@ -180,6 +180,83 @@ A 5-second clip may only need two beats. A 30-second brand film may need four.
 | 30s+ | Scale up, maintain density contrast | 3+ |
 
 Default to 15–20 seconds if not specified.
+
+---
+
+## Step 5 — Video Generation via WaveSpeed (optional)
+
+After writing the prompt, offer to generate the actual video. Ask:
+
+> "Want me to generate this video on WaveSpeed? It takes 1–2 minutes."
+
+If yes, confirm the duration and run `scripts/generate_video.py`.
+
+### Cost (720p, WaveSpeed)
+
+| Duration | Cost |
+|---|---|
+| 5s | $1.20 |
+| 10s | $2.40 |
+| 15s | $3.60 |
+
+**Always state the cost and wait for explicit approval before running.**
+
+### Usage
+
+```bash
+# Set your API key first (one time)
+export WAVESPEED_API_KEY=your_key_here   # Mac/Linux
+set WAVESPEED_API_KEY=your_key_here      # Windows
+
+# Text-to-video
+python scripts/generate_video.py --prompt "your prompt here" --duration 5
+
+# With custom output filename
+python scripts/generate_video.py --prompt "your prompt" --duration 10 --output brand_film.mp4
+
+# With reference files (images/video/audio)
+python scripts/generate_video.py --prompt "your prompt" --duration 5 --refs logo.png hero.jpg
+
+# Skip confirmation prompt
+python scripts/generate_video.py --prompt "your prompt" --duration 5 --yes
+
+# Different aspect ratio (default: 16:9)
+python scripts/generate_video.py --prompt "your prompt" --duration 5 --aspect-ratio 9:16
+```
+
+### What the script does
+
+1. **Shows cost summary** — duration, resolution, aspect ratio, output path, cost
+2. **Asks for confirmation** — "Generate this video for $1.20? [y/N]"
+3. **Uploads reference files** (if any) to WaveSpeed CDN
+4. **Submits the job** — returns a prediction ID
+5. **Polls until complete** — shows live status + elapsed time
+6. **Downloads the MP4** — saves to the output path with progress indicator
+7. **Confirms success** — shows file path, size, and cost charged
+
+### Output filename
+
+If no `--output` is given, the file is saved as:
+```
+seedance_10s_20260414_153012.mp4
+```
+
+Saved in the current working directory unless a full path is specified.
+
+### Requirements
+
+- Python 3.9+ (no external packages needed — stdlib only)
+- `WAVESPEED_API_KEY` environment variable set
+
+### Aspect ratios
+
+| Ratio | Best for |
+|---|---|
+| `16:9` | Landscape, YouTube, desktop (default) |
+| `9:16` | Portrait, TikTok, Instagram Reels |
+| `1:1` | Square, Instagram feed |
+| `21:9` | Cinematic ultra-wide |
+| `4:3` / `3:4` | Classic or portrait formats |
 
 ---
 
